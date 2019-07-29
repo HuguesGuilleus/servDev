@@ -23,6 +23,8 @@ func mime(path string) string {
 		case "css": return "text/css; charset=utf-8"
 		case "vtt": return "text/vtt"
 		case "pdf": return "application/pdf"
+		case "md","markdown": return "text/markdown"
+		case "tex": return "application/x-tex"
 		// Media
 		case "mp3": return "audio/mpeg"
 		case "mp4": return "video/mp4"
