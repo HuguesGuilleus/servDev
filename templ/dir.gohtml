@@ -1,0 +1,56 @@
+<!DOCTYPE html><html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+			body{
+				background: #f9f9fa;
+				font-family: monospace;
+				font-size: large;
+			}
+			.file {
+				display: block;
+				color: inherit;
+				text-decoration: none;
+			}
+			.file:hover{
+				background: dodgerblue;
+			}
+			.parent{
+				margin-bottom: 1ex;
+			}
+			.fileName{
+				display: inline-block;
+				width: 15ex;
+				margin-right: 1.5ex;
+				text-align: right;
+				font-weight: bold;
+			}
+			.fileSize::after{
+				display: inline-block;
+				content: "o";
+				margin-left: 0.4ex;
+			}
+		</style>
+	</head>
+	<body>
+		<a href="../" class="file parent">
+			<span class="fileName">../</span>
+			[[ PARENT / PADRES ]]
+		</a>
+		{{range .}}
+			{{if .IsDir}}
+				<a href="{{.Name}}/" class="file">
+					<span class="fileName">{{html .Name}}/</span>
+				</a>
+			{{else}}
+				<a href="{{.Name}}" class="file">
+					<span class="fileName">{{html .Name}}</span>
+					<span class="fileSize">{{html .Size}}</span>
+				</a>
+			{{end}}
+		{{else}}
+			<p>EN: The are not file in this directory.</p>
+			<p>FR: Il n'y a pas de fichiers dans ce répertoire.</p>
+		{{end}}
+	</body>
+</html>

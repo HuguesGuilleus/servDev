@@ -8,6 +8,8 @@ import (
 	"log"
 	"os"
 	"net/http"
+	"./templ"
+	"strings"
 )
 
 func handleMain(w http.ResponseWriter, r *http.Request) {
@@ -15,28 +17,32 @@ func handleMain(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path
 	file,err1 := os.Open("."+url)
 	if err1 != nil {
-		log.Print("Error ",url)
-		handle404(w,r)
+		log.Print("[Error] ",url)
+		handleNotFound(w,r)
 		return
 	}
 	defer file.Close()
 	info,err2 := file.Stat()
 	if err2 != nil {
-		log.Print("Error ",url)
-		handle404(w,r)
+		log.Print("[Error] ",url)
+		handleNotFound(w,r)
 		return
 	}
 	// Response
 	if info.IsDir() {
 		if url[len(url)-1] == '/' {
-			log.Print("Directory ",url)
-			handleDir(w,r,file)
+			if handleIndex(w,url) {
+				log.Print("[Index] ",url)
+			} else {
+				log.Print("[Directory] ",url)
+				handleDir(w,file)
+			}
 		} else {
-			log.Print("Redirect directory ",url)
+			log.Print("[Redirect directory] ",url)
 			handleRedirect(w,url+"/")
 		}
 	} else {
-		log.Print("File ",url)
+		log.Print("[File] ",url)
 		handleFile(w,file)
 	}
 }
@@ -46,18 +52,31 @@ func handleFile(w http.ResponseWriter, file *os.File) {
 	io.Copy(w,file)
 }
 
-func handleDir(w http.ResponseWriter, r *http.Request, dir *os.File) {
-	w.Write([]byte("Ceci est un répertoire, pas dev ;)\n"))
+func handleIndex(w http.ResponseWriter, path string) (ok bool) {
+	index,err := os.Open("."+path+"index.html")
+	if err != nil {
+		return false
+	}
+	defer index.Close()
+	io.Copy(w,index)
+	return true
+}
+
+func handleDir(w http.ResponseWriter, dir *os.File) {
+	w.Header().Add("Content-type","text/html; charset=utf-8")
+	files,_ := dir.Readdir(0)
+	templ.Dir.Execute(w,files)
 }
 
 func handleRedirect(w http.ResponseWriter, url string) {
+	w.Header().Add("Content-type","text/html; charset=utf-8")
 	w.Header().Add("Location",url)
 	w.WriteHeader(301)
-	w.Write([]byte(url+"\n"))
+	templ.Redirect.Execute(w,url)
 }
 
-func handle404(w http.ResponseWriter, r *http.Request) {
+func handleNotFound(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-type","text/html; charset=utf-8")
 	w.WriteHeader(404)
-	w.Write([]byte("404 Not found /// Non trouvé /// No buscado\n"))
-	w.Write([]byte(r.URL.String()+"\n"))
+	templ.NotFound.Execute(w,strings.Split(r.URL.Path,"/"))
 }

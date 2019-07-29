@@ -9,12 +9,12 @@ import (
 	"net/http"
 )
 
-const VERSION =	1.1
+const VERSION =	1.2
 
 func main() {
 	fmt.Printf("\033[H\033[2J")
 	initMime()
-	log.Print("HTTP Server for developping project // version:",VERSION)
+	log.Print("HTTP Server for developping project // version: ",VERSION)
 	http.HandleFunc("/",handleMain)
 	err := http.ListenAndServe(":8000",nil)
 	fmt.Println(err)
