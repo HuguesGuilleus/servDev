@@ -21,6 +21,7 @@ func mime(path string) string {
 		case "html": return "text/html; charset=utf-8"
 		case "txt": return "text/plain; charset=utf-8"
 		case "css": return "text/css; charset=utf-8"
+		case "webmanifest": return "application/manifest+json"
 		case "vtt": return "text/vtt"
 		case "pdf": return "application/pdf"
 		case "md","markdown": return "text/markdown"
