@@ -1,8 +1,10 @@
 <!DOCTYPE html><html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			body{
+				color: black;
 				background: #f9f9fa;
 				font-family: monospace;
 				font-size: large;
@@ -10,10 +12,18 @@
 			a{
 				font-size: xx-large;
 			}
+			address{
+				margin-top: 3ex;
+				font-size: small;
+			}
 		</style>
 		<title>Redirection</title>
 	</head>
 	<body>
 		<a href="{{.}}">{{html .}}</a>
+		<address>
+			HTTP Server for developping project<br>
+			BSD 3-Clause "New" or "Revised" License
+		</address>
 	</body>
 </html>

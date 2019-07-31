@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-const VERSION =	1.3
+const VERSION =	1.4
 
 func main() {
 	fmt.Printf("\033[H\033[2J")

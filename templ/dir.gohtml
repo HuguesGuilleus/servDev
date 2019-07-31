@@ -1,11 +1,13 @@
 <!DOCTYPE html><html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			body{
+				color: black;
 				background: #f9f9fa;
 				font-family: monospace;
-				font-size: large;
+				font-size: x-large;
 			}
 			.file {
 				display: block;
@@ -20,19 +22,28 @@
 			}
 			.fileName{
 				display: inline-block;
-				width: 15ex;
+				min-width: 15ex;
 				margin-right: 1.5ex;
 				text-align: right;
 				font-weight: bold;
 			}
 			.fileSize::after{
-				display: inline-block;
 				content: "o";
+				display: inline-block;
 				margin-left: 0.4ex;
+				color: dimgray;
+			}
+			address{
+				margin-top: 3ex;
+				font-size: small;
 			}
 		</style>
 	</head>
 	<body>
+		<a href="/" class="file">
+			<span class="fileName">/</span>
+			[[ ROOT / RACINE ]]
+		</a>
 		<a href="../" class="file parent">
 			<span class="fileName">../</span>
 			[[ PARENT / PADRES ]]
@@ -52,5 +63,9 @@
 			<p>EN: The are not file in this directory.</p>
 			<p>FR: Il n'y a pas de fichiers dans ce répertoire.</p>
 		{{end}}
+		<address>
+			HTTP Server for developping project<br>
+			BSD 3-Clause "New" or "Revised" License
+		</address>
 	</body>
 </html>

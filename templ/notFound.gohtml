@@ -1,6 +1,7 @@
 <!DOCTYPE html><html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			body{
 				background: #f9f9fa;
@@ -12,6 +13,10 @@
 			}
 			a:hover{
 				background:dodgerblue;
+			}
+			address{
+				margin-top: 3ex;
+				font-size: small;
 			}
 		</style>
 	</head>
@@ -34,5 +39,9 @@
 				<a href="{{$url}}">{{html $e}}</a>
 			{{end}}
 		{{end}}
+		<address>
+			HTTP Server for developping project<br>
+			BSD 3-Clause "New" or "Revised" License
+		</address>
 	</body>
 </html>
