@@ -37,6 +37,8 @@ func mime(path string) string {
 		case "jpg","jpeg","JPG","JPEG": return "image/jpeg"
 		// Divers
 		case "js":		return "application/javascript"
+		case "mjs":		return "application/javascript"
+		case "wasm":    return "application/wasm"
 		default:
 			log.Print("MIME unknown: ",ext)
 			return "text/plain; charset=utf-8"
