@@ -3,44 +3,62 @@
 // BSD 3-Clause "New" or "Revised" License
 
 package main
+
 import (
 	"log"
 	"regexp"
+	"sync"
 )
 
-var mimeExt *regexp.Regexp
-
-func initMime() {
-	mimeExt = regexp.MustCompile(".*[./](.*)")
-}
+var (
+	mimeExt   = regexp.MustCompile(".*[./](.*)")
+	mimeMutex = sync.Mutex{}
+	mimeList  = map[string]string{
+		// Text
+		"html":        "text/html; charset=utf-8",
+		"txt":         "text/plain; charset=utf-8",
+		"css":         "text/css; charset=utf-8",
+		"webmanifest": "application/manifest+json",
+		"vtt":         "text/vtt",
+		"pdf":         "application/pdf",
+		"md":          "text/markdown",
+		"markdown":    "text/markdown",
+		"tex":         "application/x-tex",
+		// Media,
+		"mp3":   "audio/mpeg",
+		"mp4":   "video/mp4",
+		"svg":   "image/svg+xml",
+		"ttf":   "font/ttf",
+		"tte":   "font/ttf",
+		"dfont": "font/ttf",
+		"woff":  "application/font-woff",
+		"woff2": "application/font-woff2",
+		"png":   "image/png",
+		"jpg":   "image/jpeg",
+		"jpeg":  "image/jpeg",
+		"JPG":   "image/jpeg",
+		"JPEG":  "image/jpeg",
+		// Divers,
+		"js":   "application/javascript",
+		"mjs":  "application/javascript",
+		"wasm": "application/wasm",
+		"zip":  "application/zip",
+		"json": "application/json; charset=utf-8",
+		"bash": "text/plain; charset=utf-8",
+		"sh":   "text/plain; charset=utf-8",
+		"zsh":  "text/plain; charset=utf-8",
+	}
+)
 
 // fonction qui done le type MIME en fonction du chemin/nom d'un fichier
 func mime(path string) string {
-	switch ext := mimeExt.ReplaceAllString(path,"$1"); ext {
-		// Text
-		case "html": return "text/html; charset=utf-8"
-		case "txt": return "text/plain; charset=utf-8"
-		case "css": return "text/css; charset=utf-8"
-		case "webmanifest": return "application/manifest+json"
-		case "vtt": return "text/vtt"
-		case "pdf": return "application/pdf"
-		case "md","markdown": return "text/markdown"
-		case "tex": return "application/x-tex"
-		// Media
-		case "mp3": return "audio/mpeg"
-		case "mp4": return "video/mp4"
-		case "svg": return "image/svg+xml"
-		case "ttf","tte","dfont": return "font/ttf"
-		case "woff": return "application/font-woff"
-		case "woff2": return "application/font-woff2"
-		case "png": return "image/png"
-		case "jpg","jpeg","JPG","JPEG": return "image/jpeg"
-		// Divers
-		case "js":		return "application/javascript"
-		case "mjs":		return "application/javascript"
-		case "wasm":    return "application/wasm"
-		default:
-			log.Print("MIME unknown: ",ext)
-			return "text/plain; charset=utf-8"
+	ext := mimeExt.ReplaceAllString(path, "$1")
+	mimeMutex.Lock()
+	defer mimeMutex.Unlock()
+	m, exist := mimeList[ext]
+	if !exist {
+		log.Print("MIME unknown: ", ext)
+		return "text/plain; charset=utf-8"
 	}
+	return m
 }

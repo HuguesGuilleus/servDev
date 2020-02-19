@@ -3,42 +3,67 @@
 // BSD 3-Clause "New" or "Revised" License
 
 package main
+
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"./templ"
 	"os"
 )
 
-const VERSION =	1.5
+const VERSION = 1.5
 
 func main() {
 	fmt.Printf("\033[H\033[2J")
-	initMime()
 
-	if len(os.Args) > 1 && os.Args[1] == "-d" {
-		l,err:=os.OpenFile("serv.log",os.O_WRONLY|os.O_APPEND|os.O_CREATE,0664)
-		if err != nil {
-			panic(err)
-		}
-		defer l.Close()
-		log.SetOutput(l)
-		log.Print("enregistrement du programme killServHttp.bash")
-		saveKill()
+	log.Print("[INFO] HTTP Server for developping project // version: ", VERSION)
+	http.HandleFunc("/", handleMain)
+	http.HandleFunc("/favicon.ico", handleFavicon)
+
+	if len(os.Args) == 3 {
+		// go func() {
+		// 	err := (&http.Server{
+		// 		Handler: redirect("https://localhost:8443"),
+		// 		Addr:    ":8000",
+		// 	}).ListenAndServe()
+		// 	fatal(err)
+		// }()
+		// go fatal(http.ListenAndServe(":8000", redirect("https://localhost:8443")))
+
+		log.Println("[INFO] Crt file:", os.Args[1])
+		log.Println("[INFO] Key file:", os.Args[2])
+		log.Println("")
+
+		ca, err := ioutil.ReadFile("/home/hugues/Bureau/hugues.crt")
+		fatal(err)
+
+		crt := x509.NewCertPool()
+		ok := crt.AppendCertsFromPEM(ca)
+		log.Println("add cert:", ok)
+
+		err = (&http.Server{
+			Addr: ":8443",
+			TLSConfig: &tls.Config{
+				RootCAs: crt,
+				// RootCAs: NewCertPool,
+				ServerName: "localhost",
+			},
+		}).ListenAndServeTLS(os.Args[1], os.Args[2])
+		// }).ListenAndServe()
+		fatal(err)
+
+		// fatal(http.ListenAndServeTLS(":8443", os.Args[1], os.Args[2], nil))
+		// fatal(http.ListenAndServeTLS("https://localhost:8443/", os.Args[1], os.Args[2], nil))
+	} else {
+		fatal(http.ListenAndServe(":8000", nil))
 	}
-
-	log.Print("HTTP Server for developping project // version: ",VERSION)
-	http.HandleFunc("/",handleMain)
-	err := http.ListenAndServe(":8000",nil)
-	fmt.Println(err)
 }
 
-func saveKill() {
-	prog,err := os.OpenFile("killServHttp.bash",os.O_CREATE|os.O_WRONLY,0774)
+func fatal(err error) {
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	defer prog.Close()
-	templ.Kill.Execute(prog,os.Getpid())
 }
