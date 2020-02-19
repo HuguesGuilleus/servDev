@@ -1,51 +1,62 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
-			body{
+			*[hidden] {
+				display: none !important;
+			}
+			body {
 				color: black;
 				background: #f9f9fa;
 				font-family: monospace;
 				font-size: x-large;
 			}
-			.fileList{
+			.fileList {
 				display: grid;
 			}
-			.file{
+			.file {
 				display: inline-grid;
 				grid-template-columns: 10ex 1fr;
 				grid-gap: 1.5ex;
 				color: inherit;
 				text-decoration: none;
 			}
-			.file:hover{
+			.file:hover {
 				background: dodgerblue;
 			}
-			.fileSize{
+			.fileSize {
 				grid-column: 1 / 2;
 				text-align: right;
 			}
-			.fileSize::after{
+			.fileSize::after {
 				content: "o";
 				display: inline-block;
 				margin-left: 0.4ex;
 				color: dimgray;
 			}
-			.fileName{
+			.fileName {
 				grid-column: 2 / 3;
+				font-weight: bolder;
 			}
-			.parent{
+			.parent {
 				margin-bottom: 1ex;
 			}
-			address{
+			#search {
+				display: block;
+				width: 100%;
+				margin-bottom: 3ex;
+			}
+			address {
 				margin-top: 3ex;
 				font-size: small;
 			}
 		</style>
 	</head>
 	<body>
-		<main class=fileList>
+		<input type="search" id="search" autofocus="autofocus">
+		<main class="fileList">
 			<a href="/" class="file">
 				<span class="fileName">/</span>
 			</a>
@@ -74,5 +85,12 @@
 			HTTP Server for developping project<br>
 			BSD 3-Clause "New" or "Revised" License
 		</address>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				let s = document.getElementById("search");
+				s.addEventListener("input", () => document.querySelectorAll(".file").forEach(file => file.hidden = !file.querySelector(".fileName").textContent.includes(s.value)));
+			}, {once: true});
+		</script>
 	</body>
 </html>
