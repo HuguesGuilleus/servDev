@@ -9,6 +9,6 @@ var favicon = []byte{137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 8
 
 func handleFavicon(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Add("Content-type", "image/png")
-	log.Println("[Favicon]")
+	log.Println("[FAVICON]")
 	w.Write(favicon)
 }

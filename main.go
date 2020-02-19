@@ -16,11 +16,26 @@ import (
 
 const VERSION = 1.5
 
+func init() {
+	fmt.Print("\033[H\033[2J")
+	log.SetFlags(log.Ltime)
+}
+
 func main() {
+	log.Println("[LISTEN]")
+	s := &server{
+		Dir: ".",
+	}
+	http.Handle("/", s)
+	http.HandleFunc("/favicon.ico", s.favicon)
+	log.Fatal(http.ListenAndServe(":8000", nil))
+}
+
+func main_1() {
 	fmt.Printf("\033[H\033[2J")
 
 	log.Print("[INFO] HTTP Server for developping project // version: ", VERSION)
-	http.HandleFunc("/", handleMain)
+	// http.HandleFunc("/", handleMain)
 	http.HandleFunc("/favicon.ico", handleFavicon)
 
 	if len(os.Args) == 3 {

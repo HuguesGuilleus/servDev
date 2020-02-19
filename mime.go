@@ -38,6 +38,7 @@ var (
 		"jpeg":  "image/jpeg",
 		"JPG":   "image/jpeg",
 		"JPEG":  "image/jpeg",
+		"ico":   "image/x-icon",
 		// Divers,
 		"js":   "application/javascript",
 		"mjs":  "application/javascript",
@@ -50,14 +51,16 @@ var (
 	}
 )
 
-// fonction qui done le type MIME en fonction du chemin/nom d'un fichier
+// fonction qui donne le type MIME en fonction du chemin/nom d'un fichier
 func mime(path string) string {
 	ext := mimeExt.ReplaceAllString(path, "$1")
+
 	mimeMutex.Lock()
 	defer mimeMutex.Unlock()
 	m, exist := mimeList[ext]
+
 	if !exist {
-		log.Print("MIME unknown: ", ext)
+		log.Println("[MIME UNKNOWN]", ext)
 		return "text/plain; charset=utf-8"
 	}
 	return m
