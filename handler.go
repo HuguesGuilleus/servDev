@@ -18,8 +18,13 @@ type server struct {
 	Dir http.Dir
 }
 
+func serverSignature(w http.ResponseWriter)  {
+	w.Header().Add("Server", "servHttp/1")
+}
+
 // Serve the 'favicon.ico' file.
 func (s *server) favicon(w http.ResponseWriter, r *http.Request) {
+	serverSignature(w)
 	icon, err := s.Dir.Open(path.Join(string(s.Dir), "favicon.ico"))
 	if err != nil {
 		handleFavicon(w, r)
@@ -30,6 +35,7 @@ func (s *server) favicon(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	serverSignature(w)
 	p := r.URL.Path
 	defer func() {
 		if err := recover(); err != nil {
