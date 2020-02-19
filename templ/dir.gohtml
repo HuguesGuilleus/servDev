@@ -9,29 +9,34 @@
 				font-family: monospace;
 				font-size: x-large;
 			}
-			.file {
-				display: block;
+			.fileList{
+				display: grid;
+			}
+			.file{
+				display: inline-grid;
+				grid-template-columns: 10ex 1fr;
+				grid-gap: 1.5ex;
 				color: inherit;
 				text-decoration: none;
 			}
 			.file:hover{
 				background: dodgerblue;
 			}
-			.parent{
-				margin-bottom: 1ex;
-			}
-			.fileName{
-				display: inline-block;
-				min-width: 15ex;
-				margin-right: 1.5ex;
+			.fileSize{
+				grid-column: 1 / 2;
 				text-align: right;
-				font-weight: bold;
 			}
 			.fileSize::after{
 				content: "o";
 				display: inline-block;
 				margin-left: 0.4ex;
 				color: dimgray;
+			}
+			.fileName{
+				grid-column: 2 / 3;
+			}
+			.parent{
+				margin-bottom: 1ex;
 			}
 			address{
 				margin-top: 3ex;
@@ -40,29 +45,31 @@
 		</style>
 	</head>
 	<body>
-		<a href="/" class="file">
-			<span class="fileName">/</span>
-			[[ ROOT / RACINE ]]
-		</a>
-		<a href="../" class="file parent">
-			<span class="fileName">../</span>
-			[[ PARENT / PADRES ]]
-		</a>
-		{{range .}}
-			{{if .IsDir}}
-				<a href="{{.Name}}/" class="file">
-					<span class="fileName">{{html .Name}}/</span>
-				</a>
-			{{else}}
-				<a href="{{.Name}}" class="file">
-					<span class="fileName">{{html .Name}}</span>
-					<span class="fileSize">{{html .Size}}</span>
-				</a>
-			{{end}}
-		{{else}}
-			<p>EN: The are not file in this directory.</p>
-			<p>FR: Il n'y a pas de fichiers dans ce répertoire.</p>
-		{{end}}
+		<main class=fileList>
+			<a href="/" class="file">
+				<span class="fileName">/</span>
+			</a>
+			<a href="../" class="file parent">
+				<span class="fileName">..</span>
+			</a>
+
+			{{- range . -}}
+				{{- if .IsDir -}}
+					<a href="{{.Name}}/" class="file">
+						<span class="fileName">{{html .Name}}/</span>
+					</a>
+				{{- else -}}
+					<a href="{{.Name}}" class="file">
+						<span class="fileSize">{{html .Size}}</span>
+						<span class="fileName">{{html .Name}}</span>
+					</a>
+				{{- end -}}
+			{{- else -}}
+				<p>EN: The are not file in this directory.</p>
+				<p>FR: Il n'y a pas de fichiers dans ce répertoire.</p>
+			{{- end -}}
+		</main>
+
 		<address>
 			HTTP Server for developping project<br>
 			BSD 3-Clause "New" or "Revised" License

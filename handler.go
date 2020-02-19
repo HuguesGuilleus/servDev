@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"sort"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ type server struct {
 	Dir http.Dir
 }
 
-func serverSignature(w http.ResponseWriter)  {
+func serverSignature(w http.ResponseWriter) {
 	w.Header().Add("Server", "servHttp/1")
 }
 
@@ -89,6 +90,13 @@ func handleIndex(w http.ResponseWriter, dir http.File, p string) {
 	if err != nil {
 		panic(err)
 	}
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].IsDir() == files[j].IsDir() {
+			return files[i].Name() < files[j].Name()
+		} else {
+			return files[i].IsDir()
+		}
+	})
 	log.Println("[INDEX]", p)
 	w.Header().Add("Content-type", "text/html; charset=utf-8")
 	templ.Dir.Execute(w, files)
