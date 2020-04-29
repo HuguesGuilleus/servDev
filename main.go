@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 func init() {
@@ -17,14 +18,15 @@ func init() {
 }
 
 func main() {
-	addrHttp := flag.String("http", ":8000", `L'adresse d'écoute du server HTTP`)
-	root := flag.String("root", ".", `Le répertoire racine du server`)
+	addrHttp := flag.String("h", ":8000", `L'adresse d'écoute du server HTTP`)
 	flag.Parse()
+	root := flag.Arg(0)
 
-	s := &server{Dir: http.Dir(*root)}
+	s := &server{Dir: http.Dir(root)}
 	http.Handle("/", s)
 	http.HandleFunc("/favicon.ico", s.favicon)
 
-	log.Println("[LISTEN]", *addrHttp)
+	r, _ := filepath.Abs(root)
+	log.Printf("[LISTEN] %s on %s\n", r, *addrHttp)
 	log.Fatal(http.ListenAndServe(*addrHttp, nil))
 }
