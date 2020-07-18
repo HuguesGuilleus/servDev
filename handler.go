@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -17,6 +18,19 @@ import (
 // The server contain the information.
 type server struct {
 	Dir http.Dir
+}
+
+func (s *server) Open(p string) (http.File, os.FileInfo, error) {
+	f, err := s.Dir.Open(p)
+	if err != nil {
+		return nil, nil, err
+	}
+	stat, err := f.Stat()
+	if err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+	return f, stat, nil
 }
 
 func serverSignature(w http.ResponseWriter) {
@@ -31,7 +45,8 @@ func (s *server) favicon(w http.ResponseWriter, r *http.Request) {
 		handleFavicon(w, r)
 		return
 	}
-	w.Header().Add("Content-type", "image/x-icon")
+	defer icon.Close()
+	w.Header().Add("Content-Type", "image/x-icon")
 	io.Copy(w, icon)
 }
 
@@ -46,25 +61,26 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	file, err := s.Dir.Open(p)
+	file, stat, err := s.Open(p)
 	if err != nil {
 		handleNotFound(w, r)
 		return
 	}
+	defer file.Close()
 
-	if isDir(file) {
+	if stat.IsDir() {
 		if !strings.HasSuffix(p, "/") {
 			http.Redirect(w, r, p+"/", http.StatusMovedPermanently)
 			return
 		}
-		// if index, err := s.Dir.Open(p + "index.html"); err == nil {
-		if index, err := s.Dir.Open(path.Join(p, "index.html")); err == nil {
-			handleFile(w, index, p, "index.html")
+		if index, stat, err := s.Open(p + "index.html"); err == nil {
+			defer index.Close()
+			handleFile(w, r, index, stat)
 			return
 		}
 		handleIndex(w, file, p)
 	} else {
-		handleFile(w, file, p, p)
+		handleFile(w, r, file, stat)
 	}
 }
 
@@ -78,10 +94,9 @@ func isDir(file http.File) bool {
 }
 
 // handleFile write the file into the http.ResponseWriter.
-func handleFile(w http.ResponseWriter, file http.File, p, name string) {
-	log.Println("[FILE]", p)
-	w.Header().Add("Content-type", mime(name))
-	io.Copy(w, file)
+func handleFile(w http.ResponseWriter, r *http.Request, file http.File, stat os.FileInfo) {
+	log.Println("[FILE]", r.URL.Path)
+	http.ServeContent(w, r, stat.Name(), stat.ModTime(), file)
 }
 
 // handleIndex generate the index of the directory into the http.ResponseWriter.
