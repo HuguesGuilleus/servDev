@@ -18,7 +18,7 @@
 			}
 			.file {
 				display: inline-grid;
-				grid-template-columns: 10ex 1fr;
+				grid-template-columns: 12ex 1fr;
 				grid-gap: 1.5ex;
 				color: inherit;
 				text-decoration: none;
@@ -66,18 +66,18 @@
 
 			{{- range . -}}
 				{{- if .IsDir -}}
-					<a href="{{.Name}}/" class="file">
+					<a href="{{urlquery .Name}}/" class="file">
 						<span class="fileName">{{html .Name}}/</span>
 					</a>
 				{{- else -}}
-					<a href="{{.Name}}" class="file">
+					<a href="{{urlquery .Name}}" class="file">
 						<span class="fileSize">{{html .Size}}</span>
 						<span class="fileName">{{html .Name}}</span>
 					</a>
 				{{- end -}}
 			{{- else -}}
 				<p>EN: The are not file in this directory.</p>
-				<p>FR: Il n'y a pas de fichiers dans ce répertoire.</p>
+				<p>FR&nbsp;: Il n'y a pas de fichiers dans ce répertoire.</p>
 			{{- end -}}
 		</main>
 
@@ -87,10 +87,12 @@
 		</address>
 
 		<script>
-			document.addEventListener("DOMContentLoaded", () => {
+			// document.addEventListener("DOMContentLoaded", () => { 	let s = document.getElementById("search"); 	s.addEventListener("input", () => document.querySelectorAll(".file").forEach(file => file.hidden =
+			// !file.querySelector(".fileName").textContent.includes(s.value))); }, {once: true});
+			(() => {
 				let s = document.getElementById("search");
 				s.addEventListener("input", () => document.querySelectorAll(".file").forEach(file => file.hidden = !file.querySelector(".fileName").textContent.includes(s.value)));
-			}, {once: true});
+			})();
 		</script>
 	</body>
 </html>
