@@ -58,10 +58,10 @@
 		<input type="search" id="search" autofocus="autofocus">
 		<main class="fileList">
 			<a href="/" class="file">
-				<span class="fileName">/</span>
+				<div class="fileName">/</div>
 			</a>
 			<a href="../" class="file parent">
-				<span class="fileName">..</span>
+				<div class="fileName">..</div>
 			</a>
 
 			{{- range . -}}
@@ -71,8 +71,8 @@
 					</a>
 				{{- else -}}
 					<a href="{{urlquery .Name}}" class="file">
-						<span class="fileSize">{{html .Size}}</span>
-						<span class="fileName">{{html .Name}}</span>
+						<div class="fileSize">{{html .Size}}</div>
+						<div class="fileName">{{html .Name}}</div>
 					</a>
 				{{- end -}}
 			{{- else -}}
@@ -87,8 +87,6 @@
 		</address>
 
 		<script>
-			// document.addEventListener("DOMContentLoaded", () => { 	let s = document.getElementById("search"); 	s.addEventListener("input", () => document.querySelectorAll(".file").forEach(file => file.hidden =
-			// !file.querySelector(".fileName").textContent.includes(s.value))); }, {once: true});
 			(() => {
 				let s = document.getElementById("search");
 				s.addEventListener("input", () => document.querySelectorAll(".file").forEach(file => file.hidden = !file.querySelector(".fileName").textContent.includes(s.value)));

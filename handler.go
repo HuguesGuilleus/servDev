@@ -5,7 +5,6 @@
 package main
 
 import (
-	"./templ"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +13,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"text/template"
 )
 
 // The server contain the information.
@@ -100,7 +100,7 @@ func handleIndex(w http.ResponseWriter, dir http.File, p string) {
 	})
 	log.Println("[INDEX]", p)
 	w.Header().Add("Content-type", "text/html; charset=utf-8")
-	templ.Dir.Execute(w, files)
+	templDir.Execute(w, files)
 }
 
 // ResponseWriter response with status not found.
@@ -108,5 +108,12 @@ func handleNotFound(w http.ResponseWriter, r *http.Request) {
 	log.Println("[NOT FOUND]", r.URL.Path)
 	w.Header().Add("Content-type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
-	templ.NotFound.Execute(w, strings.Split(r.URL.Path, "/"))
+	templNotFound.Execute(w, strings.Split(r.URL.Path, "/"))
 }
+
+/* TEMPLATE */
+
+var (
+	templDir      = template.Must(template.New("").Parse(string(TemplDir())))
+	templNotFound = template.Must(template.New("").Parse(string(TemplNotFound())))
+)
