@@ -1,11 +1,12 @@
 // HTTP Server for developping project
-// 2019 GUILLEUS Hugues <ghugues@netc.fr>
+// 2019, 2020 GUILLEUS Hugues <ghugues@netc.fr>
 // BSD 3-Clause "New" or "Revised" License
 
 package main
 
 import (
 	"./templ"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -52,15 +53,8 @@ func (s *server) favicon(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	serverSignature(w)
-	p := r.URL.Path
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("[ERROR]", p, "::", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			io.WriteString(w, "Internal error")
-		}
-	}()
 
+	p := r.URL.Path
 	file, stat, err := s.Open(p)
 	if err != nil {
 		handleNotFound(w, r)
@@ -84,15 +78,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Return true if the file is a directory. In error case, the fonction panic.
-func isDir(file http.File) bool {
-	info, err := file.Stat()
-	if err != nil {
-		panic(err)
-	}
-	return info.IsDir()
-}
-
 // handleFile write the file into the http.ResponseWriter.
 func handleFile(w http.ResponseWriter, r *http.Request, file http.File, stat os.FileInfo) {
 	log.Println("[FILE]", r.URL.Path)
@@ -103,7 +88,8 @@ func handleFile(w http.ResponseWriter, r *http.Request, file http.File, stat os.
 func handleIndex(w http.ResponseWriter, dir http.File, p string) {
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		panic(err)
+		http.Error(w, fmt.Sprintf("Read dir %q fail: %v\r\n", p, err), http.StatusInternalServerError)
+		return
 	}
 	sort.Slice(files, func(i, j int) bool {
 		if files[i].IsDir() == files[j].IsDir() {
