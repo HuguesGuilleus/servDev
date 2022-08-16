@@ -8,9 +8,7 @@ Copy release binary into your PATH or build yourself (`go build`).
 
 ## Usage
 
-| Option | Description              |
-| -----: | :----------------------- |
-|     -a | Listen address           |
-|     -c | TLS certificate          |
-|     -k | TLS key                  |
-|     -s | Listen address for HTTPS |
+| Option | Description                                    |
+| -----: | :--------------------------------------------- |
+|     -a | Listen address                                 |
+|     -c | Disable minify and reload on file system event |
