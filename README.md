@@ -8,7 +8,8 @@ Copy release binary into your PATH or build yourself (`go build`).
 
 ## Usage
 
-| Option | Description                                    |
-| -----: | :--------------------------------------------- |
-|     -a | Listen address                                 |
-|     -c | Disable minify and reload on file system event |
+| Option | Description                        |
+| -----: | :--------------------------------- |
+|     -a | Listen address                     |
+|     -l | No inject hot reload code in HTML  |
+|     -m | No minify served file (css and js) |

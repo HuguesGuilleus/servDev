@@ -22,7 +22,10 @@ import (
 	"time"
 )
 
-var noChange = false
+var (
+	noMinify     = false
+	noLivereload = false
+)
 
 func main() {
 	flag.Usage = func() {
@@ -30,7 +33,8 @@ func main() {
 		flag.PrintDefaults()
 	}
 	address := flag.String("a", ":8000", "Listen address")
-	flag.BoolVar(&noChange, "c", false, "No change served file (minify and hot reload)")
+	flag.BoolVar(&noMinify, "m", false, "No minify served file (css and js)")
+	flag.BoolVar(&noLivereload, "l", false, "No inject hot reload code in HTML")
 	flag.Parse()
 
 	go watching()
@@ -166,26 +170,37 @@ func open(fsys http.FileSystem, path string) (file http.File, info fs.FileInfo, 
 }
 
 func serveContent(w http.ResponseWriter, r *http.Request, name string, modtime time.Time, content io.ReadSeeker) {
-	if noChange {
-		http.ServeContent(w, r, name, modtime, content)
-		return
-	}
 	switch {
 	case strings.HasSuffix(name, ".html"):
-		data, err := io.ReadAll(content)
-		if err != nil {
-			responseError(w, r, err)
-			return
+		if noLivereload {
+			http.ServeContent(w, r, name, modtime, content)
+		} else {
+			data, err := io.ReadAll(content)
+			if err != nil {
+				responseError(w, r, err)
+				return
+			}
+			w.Write(htmlHeadRegexp.ReplaceAll(data, []byte(`<head$1>`+eventSourceScript)))
 		}
-		w.Write(htmlHeadRegexp.ReplaceAll(data, []byte(`<head$1>`+eventSourceScript)))
 
 	case strings.HasSuffix(name, ".js") || name == "js":
-		if err := js.Minify(nil, w, content, nil); err != nil {
-			log.Printf("[error.minify] %q: %v", name, err)
+		if noMinify {
+			http.ServeContent(w, r, name, modtime, content)
+		} else {
+			w.Header().Set("Content-Type", "application/javascript")
+			if err := js.Minify(nil, w, content, nil); err != nil {
+				log.Printf("[error.minify] %q: %v", name, err)
+			}
 		}
+
 	case strings.HasSuffix(name, ".css") || name == "css":
-		if err := css.Minify(nil, w, content, nil); err != nil {
-			log.Printf("[error.minify] %q: %v", name, err)
+		if noMinify {
+			http.ServeContent(w, r, name, modtime, content)
+		} else {
+			w.Header().Set("Content-Type", "text/css")
+			if err := css.Minify(nil, w, content, nil); err != nil {
+				log.Printf("[error.minify] %q: %v", name, err)
+			}
 		}
 
 	default:
